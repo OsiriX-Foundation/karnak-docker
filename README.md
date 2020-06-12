@@ -24,13 +24,13 @@ Karnak has been tested with:
 
 Before to start karnak you must create a folder secrets on the root of the project and create the following secrets:
 
-* karnak_hmac_key
-* karnak_postgres_password
-* mainzelliste_api_key
-* mainzelliste_postgres_password
-* mainzelliste_pid_k1
-* mainzelliste_pid_k2
-* mainzelliste_pid_k3
+* `karnak_hmac_key`
+* `karnak_postgres_password`
+* `mainzelliste_api_key`
+* `mainzelliste_postgres_password`
+* `mainzelliste_pid_k1`
+* `mainzelliste_pid_k2`
+* `mainzelliste_pid_k3`
 
 or you can generate the secret with the script `start.sh`. (No guarantee that it works on your machine)
 
