@@ -2,6 +2,15 @@
 
 This repository shows an example docker-compose to launch Karnak with all his dependencies.
 
+The default url and credentials is defined below:
+
+* Karnak URL user interface: http://localhost:8081
+* Karnak URL DICOM listener: http://localhost:11119
+* Default user: admin
+* Default password: admin
+
+The port of user interface and DICOM listener is defined in the file `.env`
+
 Currently Karnak needs:
 * Postgres DataBase
 * Mainzelliste
@@ -13,6 +22,8 @@ Karnak has been tested with:
 * [docker](https://docs.docker.com/install/) version: **19.03**
 * [docker-compose](https://docs.docker.com/compose/install/) version: **1.22**
 
+You can generate the secret and start Karnak with the script `start.sh`. (No guarantee that it works on your machine)
+
 ## docker-compose commands
 
 * start a docker-compose: `docker-compose up`
@@ -22,7 +33,9 @@ Karnak has been tested with:
 
 ## Karnak's secrets
 
-Before to start karnak you must create a folder secrets on the root of the project and create the following secrets:
+*These secrets are used in the proposed docker-compose, because it use the environment variables ending with _FILE (more details in 'Karnak's environment variables')*
+
+Before to start the docker-compose, you need to make sure the secrets folder and the following secrets are defined:
 
 * `karnak_hmac_key`
 * `karnak_postgres_password`
@@ -31,8 +44,6 @@ Before to start karnak you must create a folder secrets on the root of the proje
 * `mainzelliste_pid_k1`
 * `mainzelliste_pid_k2`
 * `mainzelliste_pid_k3`
-
-or you can generate the secret with the script `start.sh`. (No guarantee that it works on your machine)
 
 ## Karnak's environment variables
 
