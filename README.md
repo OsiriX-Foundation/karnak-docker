@@ -6,8 +6,7 @@ The default url and credentials is defined below:
 
 * Karnak URL user interface: http://localhost:8081
 * Karnak URL DICOM listener: http://localhost:11119
-* Default user: admin
-* Default password: admin
+* Default Karnak user: admin
 
 The port of user interface and DICOM listener is defined in the file `.env`
 
@@ -38,6 +37,7 @@ You can generate the secret and start Karnak with the script `start.sh`. (No gua
 Before to start the docker-compose, you need to make sure the secrets folder and the following secrets are defined:
 
 * `karnak_hmac_key`
+* `karnak_login_password`
 * `karnak_postgres_password`
 * `mainzelliste_api_key`
 * `mainzelliste_postgres_password`
@@ -106,3 +106,16 @@ The key used for the HMAC. This HMAC will be used for all the hash created by ka
 `KARNAK_HMAC_KEY_FILE`
 
 The key used for the HMAC via file input. (alternative to `KARNAK_HMAC_KEY`).
+
+`KARNAK_LOGIN_ADMIN`
+
+Login used for Karnak. (optional, default is `admin`).
+
+`KARNAK_LOGIN_PASSWORD`
+
+Password used for Karnak. (optional, default is `undefined`).
+
+`KARNAK_LOGIN_PASSWORD_FILE`
+
+Password used for Karnak via file input. (alternative to `KARNAK_LOGIN_PASSWORD`).
+

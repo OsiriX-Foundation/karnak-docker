@@ -13,6 +13,7 @@ services:
       - postgres_karnak_password
       - mainzellisteApiKey
       - karnak_hmac_key
+      - karnak_login_password
 
   karnak-db:
     image: postgres:12.1-alpine
@@ -49,6 +50,8 @@ services:
       - mainzelliste-db
 
 secrets:
+  karnak_login_password:
+    file: secrets/karnak_login_password
   karnak_hmac_key:
     file: secrets/karnak_hmac_key
   postgres_karnak_password:

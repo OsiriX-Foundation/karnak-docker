@@ -41,4 +41,23 @@ do
   printf "%s\n" $R > $secretpath$secretfileK
 done
 
+secretKarnakLoginPassword="karnak_login_password"
+pass="ERROR"
+while [ $pass != "OK" ]
+do	
+	read -p "Enter your Karnak login password: " -s firstPasswordEntry
+	echo
+	read -p "Validated your password: " -s secondPasswordEntry
+	echo
+	if [ $firstPasswordEntry == $secondPasswordEntry ]
+	then
+		pass="OK"
+	else
+		echo "The second password does not correspond to the first"
+	fi
+done
+printf "%s\n" $firstPasswordEntry > $secretpath$secretKarnakLoginPassword
+echo "The Karnak login password has been created"
+
+
 docker-compose pull && docker-compose up
