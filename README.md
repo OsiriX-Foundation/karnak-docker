@@ -14,6 +14,8 @@ Currently Karnak needs:
 * Postgres DataBase
 * Mainzelliste
 
+## De-identification by profile
+
 The principle of de-identification with a profile pipe defined by KARNAK is explained here : [Profile](profileExample/)
 
 # Launch Karnak
