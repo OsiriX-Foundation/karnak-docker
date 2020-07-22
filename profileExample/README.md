@@ -1,12 +1,12 @@
 # Profile
 
-In KARNAK on the profile page, you can upload your custom profile.
+In the graphical interface of KARNAK, you can click on the button Profiles. This allows to see the list of profiles and to import new profiles.
 
-A profile in KARNAK is a list of different profile or action defined on a scope of tags. During the de-identification, KARNAK will built this list and apply to a tag and its value each profile in the list. If a profile apply his action on a tag, KARNAK will move on to the next tag. So if the first profile used the tag, the next profile will never be called on that tag.
+A profile file is one or a list of profile elements which are defined for a group of DICOM attributes and with a particular action. During the de-identification, KARNAK will apply the profile elements to all applicable DICOM attributes. The principle is that it is not possible to apply several profile elements on a DICOM attribute.The profile elements are applied in the order defined in the yaml file and therefore it will be the first applicable profile element that will modify the value of a DICOM attribute and the following profile elements will not be applied.
 
 Currently the profile must be a yaml file (MIME-TYPE: **application/x-yaml**) and respect the definition as below.
 
-## Metadata
+## Profile metadata
 
 The "headers" of the profile are this metadata. All this headers are optional, but for a better user experience we recommend that set the name to a minimum.
 
@@ -14,25 +14,25 @@ The "headers" of the profile are this metadata. All this headers are optional, b
 
 `version` - The version of your profile.
 
-`minimumkarnakversion` - The version of KARNAK when the profile has been built.
+`minimumKarnakVersion` - The version of KARNAK when the profile has been built.
 
-`defaultIssuerOfPatientID` - this value is used to built the patient's pseudonym.
+`defaultIssuerOfPatientID` - this value will be used to build the patient's pseudonym when IssuerOfPatientID value is not available in DICOM file.
 
-`profiles` - The list of profile applied on the desidentification. The first profile of this list is first called.
+`profileElements` - The list of profile applied on the desidentification. The first profile of this list is first called.
 
-## Profile
+## Profile element
 
-A profile is defined as below in the yaml.
+A profile element is defined as below in the yaml.
 
-`name` - The name of your profile
+`name` - The name of your profile element
 
-`codename` - The profile has been applied (Must exist in KARNAK)). The list of possible profiles is defined below.
+`codename` - The ID of the profile element. It must related to the list profile elements defined below.
 
-`action` - The action to apply to the profile. For example K (keep), X (remove)
+`action` - The action to apply to the profile element. For example K (keep), X (remove)
 
 `tags` - List of tags for the current profile. The action defined in the profile will be applied on this list of tags.
 
-`exceptedtags` - This list represents the tags where the action will not be applied. This means that if a tag defined in this list appears for this profile, it will give control to the next profile.
+`excludedTags` - This list represents the tags where the action will not be applied. This means that if a tag defined in this list appears for this profile, it will give control to the next profile.
 
 ### Tag
 
@@ -46,7 +46,7 @@ A tag pattern can be defined as below: `(0010,XXXX)` groups all these tags `(001
 
 **We strongly recommend to use this profile systematically**
 
-This profile need this parameters:
+This profile item need this parameters:
 
 * name
 * codename
@@ -62,16 +62,16 @@ Example:
 * K - keep
 * X - remove
 
-This profile need this parameters:
-
+This profile element need this parameters:
+profiles
 * name
 * codename
 * action
 * tags
 
-This profile can have these optional parameters:
+This profile element can have these optional parameters:
 
-* exceptedtags
+* excludedTags
 
 In this example, all tags starting with 0028 will be removed excepted (0028,1199) which will be kept.
 
@@ -81,7 +81,7 @@ In this example, all tags starting with 0028 will be removed excepted (0028,1199
   action: "X"
   tags:
     - "(0028,xxxx)"
-  exceptedtags:
+  excludedTags:
     - "(0028,1199)"
 
 - name: "Keep tags 0028,1199"
@@ -105,7 +105,7 @@ This profile need this parameters:
 This profile can have these optional parameters:
 
 * tags
-* exceptedtags
+* excludedTags
 
 In this example, all tags starting with 0009 will be kept and all private tags will be deleted.
 
@@ -132,9 +132,9 @@ The tag pattern (0073,xx00) and (7053,xx09) is defined as [Philips PET Private G
 ```
 name: "An Example"
 version: "1.0"
-minimumkarnakversion: "0.1"
+minimumKarnakVersion: "0.1"
 defaultIssuerOfPatientID: "DPA"
-profiles:
+profileElements:
   - name: "Remove tags 0008,0008; 0008,0013"
     codename: "action.on.specific.tags"
     action: "X"
