@@ -1,4 +1,4 @@
-# karnakDocker
+# KARNAK docker
 
 This repository shows an example docker-compose to launch Karnak with all his dependencies.
 
