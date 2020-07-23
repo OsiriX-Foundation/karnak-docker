@@ -25,7 +25,7 @@ KARNAK has been tested with:
 * [docker](https://docs.docker.com/install/) version: **19.03**
 * [docker-compose](https://docs.docker.com/compose/install/) version: **1.22**
 
-You can generate the secret and start KARNAK with the script `start.sh`. (No guarantee that it works on your machine)
+You can generate the secret and start KARNAK with the `start.sh` script present at the root of this repository. (No guarantee that it works on your machine)
 
 ## docker-compose commands
 
