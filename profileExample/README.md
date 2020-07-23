@@ -1,6 +1,6 @@
 # Profile
 
-In the graphical interface of KARNAK, you can click on the button Profiles. This allows to see the list of profiles and to import new profiles.
+In the graphical interface of KARNAK, you can click on the button Profile. This allows to see the list of profiles and to import new profiles.
 
 A profile file is one or a list of profile elements which are defined for a group of DICOM attributes and with a particular action. During the de-identification, KARNAK will apply the profile elements to all applicable DICOM attributes. The principle is that it is not possible to apply several profile elements on a DICOM attribute.The profile elements are applied in the order defined in the yaml file and therefore it will be the first applicable profile element that will modify the value of a DICOM attribute and the following profile elements will not be applied.
 
@@ -18,7 +18,7 @@ The "headers" of the profile are this metadata. All this headers are optional, b
 
 `defaultIssuerOfPatientID` - this value will be used to build the patient's pseudonym when IssuerOfPatientID value is not available in DICOM file.
 
-`profileElements` - The list of profile applied on the desidentification. The first profile of this list is first called.
+`profileElements` - The list of profile element applied on the desidentification. The first profile element of this list is first called.
 
 ## Profile element
 
@@ -42,11 +42,13 @@ A tag pattern can be defined as below: `(0010,XXXX)` groups all these tags `(001
 
 ### codename
 
+---
+
 `basic.dicom.profile` is the [basic profile defined by DICOM](http://dicom.nema.org/medical/dicom/current/output/chtml/part15/chapter_E.html). This profile applied the action defined by DICOM on the tags that identifies.
 
 **We strongly recommend to use this profile systematically**
 
-This profile item need this parameters:
+This profile element need this parameters:
 
 * name
 * codename
@@ -58,12 +60,14 @@ Example:
   codename: "basic.dicom.profile"
 ```
 
+---
+
 `action.on.specific.tags` is a profile that apply a action on a group of tags defined by the user. The action possible is:
 * K - keep
 * X - remove
 
 This profile element need this parameters:
-profiles
+
 * name
 * codename
 * action
@@ -90,6 +94,8 @@ In this example, all tags starting with 0028 will be removed excepted (0028,1199
   tags:
     - "0028,1199"
 ```
+
+---
 
 `action.on.privatetags` is a profile that apply a action given on all private tags or a group of private tags defined by the user. If the tag given isn't private, the profile will not be called. The action possible is:
 
@@ -120,6 +126,8 @@ In this example, all tags starting with 0009 will be kept and all private tags w
   codename: "action.on.privatetags"
   action: "X"
 ```
+
+---
 
 ## A full example of profile
 
