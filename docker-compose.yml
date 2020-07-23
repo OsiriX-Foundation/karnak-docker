@@ -2,10 +2,13 @@ version: '3.7'
 
 services:
   karnak:
-    image: osirixfoundation/karnak:latest
+    container_name: karnak
+    image: karnak:local
     ports:
       - "${DICOM_LISTENER_PORT}:11119"
       - "${KARNAK_WEB_PORT}:8081"
+    environment:
+      KARNAK_WAIT_FOR: karnak-db:5432
     env_file: karnak.env
     depends_on:
       - karnak-db
@@ -16,6 +19,7 @@ services:
       - karnak_login_password
 
   karnak-db:
+    container_name: karnak-db
     image: postgres:12.1-alpine
     environment:
       - POSTGRES_DB=karnak
@@ -27,6 +31,7 @@ services:
       - postgres_karnak_password
 
   mainzelliste-db:
+    container_name: mainzelliste-db
     image: postgres:9.5-alpine
     environment:
       - POSTGRES_DB=mainzelliste
@@ -38,6 +43,7 @@ services:
       - mainzellisteDbPassword
 
   mainzelliste:
+    container_name: mainzelliste
     image: osirixfoundation/karnak-mainzelliste:latest
     env_file: mainzelliste.env
     secrets:
