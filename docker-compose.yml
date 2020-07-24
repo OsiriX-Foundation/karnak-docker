@@ -3,7 +3,7 @@ version: '3.7'
 services:
   karnak:
     container_name: karnak
-    image: osirixfoundation/karnak:latest
+    image: osirixfoundation/karnak:${KARNAK_VERSION}
     ports:
       - "${DICOM_LISTENER_PORT}:11119"
       - "${KARNAK_WEB_PORT}:8081"

@@ -8,7 +8,7 @@ The default url and credentials is defined below:
 * KARNAK URL DICOM listener: http://localhost:11119
 * Default KARNAK user: admin
 
-The port of user interface and DICOM listener is defined in the file `.env`
+The KARNAK's version, port of user interface and DICOM listener is defined in the file `.env`
 
 Currently KARNAK needs:
 * Postgres DataBase
