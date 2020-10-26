@@ -1,1 +1,21 @@
 /secrets
+
+# IntelliJ project files
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# eclipse project files
+.settings/
+.classpath
+.project
+
+# NetBeans specific
+nbproject/private/
+build/
+nbbuild/
+dist/
+nbdist/
+nbactions.xml
+nb-configuration.xml

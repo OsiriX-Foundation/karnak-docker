@@ -1,28 +1,28 @@
 # Profile
 
-In the graphical interface of KARNAK, you can click on the button Profile. This allows to see the list of profiles and to import new profiles.
+In the Karnak user interface, you can click on the Profile button on the left. This allows you to see the list of profiles and to import new profiles.
 
-A profile file is one or a list of profile elements which are defined for a group of DICOM attributes and with a particular action. During the de-identification, KARNAK will apply the profile elements to all applicable DICOM attributes. The principle is that it is not possible to apply several profile elements on a DICOM attribute.The profile elements are applied in the order defined in the yaml file and therefore it will be the first applicable profile element that will modify the value of a DICOM attribute and the following profile elements will not be applied.
+A profile file is one or a list of profile elements that are defined for a group of DICOM attributes and with a particular action. During de-identification, Karnak will apply the profile elements to all applicable DICOM attributes. The principle is that it is not possible to apply multiple profile elements to a DICOM attribute. The profile elements are applied in the order defined in the yaml file and, therefore, it is the first applicable profile element that will modify the value of a DICOM attribute and the following profile elements will not be applied.
 
-Currently the profile must be a yaml file (MIME-TYPE: **application/x-yaml**) and respect the definition as below.
+Currently, the profile must be a yaml file (MIME-TYPE: **application/x-yaml**) and respect the definition as below.
 
 ## Profile metadata
 
-The "headers" of the profile are this metadata. All this headers are optional, but for a better user experience we recommend that set the name to a minimum.
+All these metadata are optional, but for a better user experience we recommend defining at least the name and the version.
 
 `name` - The name of your profile.
 
 `version` - The version of your profile.
 
-`minimumKarnakVersion` - The version of KARNAK when the profile has been built.
+`minimumKarnakVersion` - The version of Karnak when the profile has been built.
 
 `defaultIssuerOfPatientID` - this value will be used to build the patient's pseudonym when IssuerOfPatientID value is not available in DICOM file.
 
-`profileElements` - The list of profile element applied on the desidentification. The first profile element of this list is first called.
+`profileElements` - The list of profile element applied on the de-identification. The first profile element of this list is first called.
 
 ## Profile element
 
-A profile element is defined as below in the yaml.
+A profile element is defined as below in the yaml file.
 
 `name` - The name of your profile element
 
@@ -36,9 +36,9 @@ A profile element is defined as below in the yaml.
 
 ### Tag
 
-The tags can be defined on different format: `(0010,0010)`; `0010,0010`; `00100010`;
+DICOM Tags can be defined in different formats: `(0010,0010)`; `0010,0010`; `00100010`;
 
-A tag pattern can be defined as below: `(0010,XXXX)` groups all these tags `(0010, [0000-FFFF])`
+A tag pattern represent a group of tags and can be defined as follows: e.g. `(0010,XXXX)` represent all the tags of group 0010.
 
 ### codename
 
@@ -46,14 +46,9 @@ A tag pattern can be defined as below: `(0010,XXXX)` groups all these tags `(001
 
 `basic.dicom.profile` is the [basic profile defined by DICOM](http://dicom.nema.org/medical/dicom/current/output/chtml/part15/chapter_E.html). This profile applied the action defined by DICOM on the tags that identifies.
 
-**We strongly recommend to use this profile systematically**
+**We strongly recommend including this profile as basis for de-identification.**
 
-This profile element need this parameters:
-
-* name
-* codename
-
-Example:
+This profile element requires the following parameters:
 
 ```
 - name: "DICOM basic profile"
@@ -66,7 +61,7 @@ Example:
 * K - keep
 * X - remove
 
-This profile element need this parameters:
+This profile element requires the following parameters:
 
 * name
 * codename
@@ -102,7 +97,7 @@ In this example, all tags starting with 0028 will be removed excepted (0028,1199
 * K - keep
 * X - remove
 
-This profile need this parameters:
+This profile element requires the following parameters:
 
 * name
 * codename
@@ -133,21 +128,20 @@ In this example, all tags starting with 0009 will be kept and all private tags w
 
 This example remove two tags not defined in the basic DICOM profile, keep the Philips PET private group and apply the basic DICOM profile.
 
-The tag 0008,0008 is the Image identification characteristics and the tag 0008,0013 is the Instance Creation Time.
+The tag 0008,0012 is Instance Creation Date and the tag 0008,0013 is Instance Creation Time.
 
-The tag pattern (0073,xx00) and (7053,xx09) is defined as [Philips PET Private Group by DICOM](http://dicom.nema.org/medical/dicom/current/output/chtml/part15/sect_E.3.10.html).
+The tag pattern (0073,xx00) and (7053,xx09) are defined in [Philips PET Private Group by DICOM](http://dicom.nema.org/medical/dicom/current/output/chtml/part15/sect_E.3.10.html).
 
 ```
-name: "An Example"
+name: "Profile Example"
 version: "1.0"
-minimumKarnakVersion: "0.1"
-defaultIssuerOfPatientID: "DPA"
+minimumKarnakVersion: "0.9.2"
 profileElements:
-  - name: "Remove tags 0008,0008; 0008,0013"
+  - name: "Remove tags 0008,0012; 0008,0013"
     codename: "action.on.specific.tags"
     action: "X"
     tags:
-      - "0008,0008"
+      - "0008,0012"
       - "0008,0013"
 
   - name: "Keep Philips PET Private Group"
