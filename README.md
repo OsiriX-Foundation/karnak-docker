@@ -8,7 +8,7 @@ The default url and credentials:
 * Default Karnak user: admin
 * Karnak DICOM listener port: 11119
 
-All the Karnak's parameters can be modified in the `.env` file and are described in [Environment Variables](#environment_variables).
+All the Karnak's parameters can be modified in the `.env` file and are described in [Environment Variables](#environment-variables).
 
 Karnak contains third-party components:
 * Postgres database for the persistence of Karnak settings 
@@ -24,7 +24,7 @@ Karnak has been tested with [docker](https://docs.docker.com/install/) **19.03**
 
 1. Execute `generateSecrets.sh` to generate the secrets required by Karnak
 2. Adapt all the *.env files if necessary
-3. Start docker-compose with commands (or [create docker-compose service](#create_docker-compose_service)) 
+3. Start docker-compose with commands (or [create docker-compose service](#create-docker-compose-service)) 
 
 ## Docker commands
 
