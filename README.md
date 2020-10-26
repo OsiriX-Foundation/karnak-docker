@@ -28,6 +28,9 @@ Karnak has been tested with [docker](https://docs.docker.com/install/) **19.03**
 
 ## Docker commands
 
+Commands from the root of this repository.
+
+* Update docker images ([version](https://hub.docker.com/r/osirixfoundation/karnak/tags) defined into .env): `docker-compose pull`
 * Start a docker-compose: `docker-compose up -d`
 * Stop a docker-compose: `docker-compose down`
 * Stop and remove volume of a docker-compose (reset all the data): `docker-compose down -v`
