@@ -30,6 +30,10 @@ A profile element is defined as below in the yaml file.
 
 `action` - The action to apply to the profile element. For example K (keep), X (remove)
 
+`option` - Some profiles contain option.
+
+`arguments` - Some profiles contain one or more arguments. Arguments is a list that contain a key and a value.
+
 `tags` - List of tags for the current profile. The action defined in the profile will be applied on this list of tags.
 
 `excludedTags` - This list represents the tags where the action will not be applied. This means that if a tag defined in this list appears for this profile, it will give control to the next profile.
@@ -50,7 +54,7 @@ A tag pattern represent a group of tags and can be defined as follows: e.g. `(00
 
 This profile element requires the following parameters:
 
-```
+```yaml
 - name: "DICOM basic profile"
   codename: "basic.dicom.profile"
 ```
@@ -74,7 +78,7 @@ This profile element can have these optional parameters:
 
 In this example, all tags starting with 0028 will be removed excepted (0028,1199) which will be kept.
 
-```
+```yaml
 - name: "Remove tags"
   codename: "action.on.specific.tags"
   action: "X"
@@ -110,7 +114,7 @@ This profile can have these optional parameters:
 
 In this example, all tags starting with 0009 will be kept and all private tags will be deleted.
 
-```
+```yaml
 - name: "Keep private tags starint with 0009"
   codename: "action.on.privatetags"
   action: "K"
@@ -124,6 +128,95 @@ In this example, all tags starting with 0009 will be kept and all private tags w
 
 ---
 
+`action.on.dates` is a profile element that applies actions on dates. This profile element contains several options that can be applied to dates.
+
+This profile need this parameters:
+
+* name
+* codename
+* option
+
+This profile element need one of this options:
+
+* shift
+* shift_range
+* date_format
+
+This profile element can have these optional parameters:
+
+* tags
+* exceptedtags
+
+Below, the examples with the different possible options
+
+1.  **shift** option allows to shift a date according to the following arguments:
+
+* seconds
+* days
+
+In this example, all the tags starting with 0010 and that are date fields are offset by 30 seconds and 10 days.
+
+```yaml
+  - name: "Shift Date"
+    codename: "action.on.dates"
+    arguments:
+      seconds: 30
+      days: 10
+    option: "shift"
+    tags:
+      - "0010,XXXX"
+```
+
+2. **shift_range** option allows to shift a date according to a date range according to the following arguments:
+
+- max_seconds
+- max_days
+- min_seconds (Optional)
+- min_days (Optional)
+
+In this example, all the tags starting with 0008,002 and that are date fields are shifted randomly in a range of maximum second 60 maximum days 100 and minimum days 50. For each same patient belonging to the same project the random value shifted randomly will always be the same (see section hmac)
+
+
+```yaml
+  - name: "Shift Range Date"
+    codename: "action.on.dates"
+    arguments:
+      max_seconds: 60
+      min_days: 50
+      max_days: 100
+    option: "shift_range"
+    tags:
+      - "0008,002X"
+```
+
+3. **date_format** option allows you to delete the days or the month and days.
+
+With this example profile element, a tag value contains this entry date for example  `20140504 `  with the argument key  `remove ` and value  `month_day `, will have this output date  `20140101`.
+
+```yaml
+  - name: "Date format"
+    codename: "action.on.dates"
+    arguments:
+      remove: "month_day"
+    option: "date_format"
+    tags:
+      - "0008,003X"
+```
+
+With this example profile element, a tag value contains this entry date for example  `20140504 `  with the argument key  `remove ` and value  `month_day `, will have this output date  `20140501`.
+
+```yaml
+  - name: "Date format"
+    codename: "action.on.dates"
+    arguments:
+      remove: "day"
+    option: "date_format"
+    tags:
+      - "0008,003X"
+```
+
+---
+
 ## A full example of profile
 
 This example remove two tags not defined in the basic DICOM profile, keep the Philips PET private group and apply the basic DICOM profile.
@@ -132,7 +225,7 @@ The tag 0008,0012 is Instance Creation Date and the tag 0008,0013 is Instance Cr
 
 The tag pattern (0073,xx00) and (7053,xx09) are defined in [Philips PET Private Group by DICOM](http://dicom.nema.org/medical/dicom/current/output/chtml/part15/sect_E.3.10.html).
 
-```
+```yaml
 name: "Profile Example"
 version: "1.0"
 minimumKarnakVersion: "0.9.2"
