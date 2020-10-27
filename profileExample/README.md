@@ -128,7 +128,7 @@ In this example, all tags starting with 0009 will be kept and all private tags w
 
 ---
 
-`action.on.dates` is a profile element that applies actions on dates. This profile element contains several options that can be applied to dates.
+`action.on.dates` is a profile element that applies actions on dates. This profile element contains several options and  will be executed only on the following VR types: AS, DA, DT ,TM.
 
 This profile need this parameters:
 
@@ -145,14 +145,14 @@ This profile element need one of this options:
 This profile element can have these optional parameters:
 
 * tags
-* exceptedtags
+* excludedTags
 
 Below, the examples with the different possible options
 
 1.  **shift** option allows to shift a date according to the following arguments:
 
-* seconds
-* days
+* seconds (required)
+* days (required)
 
 In this example, all the tags starting with 0010 and that are date fields are offset by 30 seconds and 10 days.
 
@@ -169,12 +169,12 @@ In this example, all the tags starting with 0010 and that are date fields are of
 
 2. **shift_range** option allows to shift a date according to a date range according to the following arguments:
 
-- max_seconds
-- max_days
+- max_seconds (required)
+- max_days (required)
 - min_seconds (Optional)
 - min_days (Optional)
 
-In this example, all the tags starting with 0008,002 and that are date fields are shifted randomly in a range of maximum second 60 maximum days 100 and minimum days 50. For each same patient belonging to the same project the random value shifted randomly will always be the same (see section hmac)
+In this example, all the tags starting with 0008,002 and that are date fields are shifted randomly in a range of maximum second 60 maximum days 100 and minimum days 50. For each same patient belonging to the same project the random value shifted randomly will always be the same (For more details about the project and the Karnak random, see [Karnak Doc](https://github.com/OsiriX-Foundation/karnak/tree/master/doc))
 
 
 ```yaml
