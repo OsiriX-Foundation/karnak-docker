@@ -8,7 +8,7 @@ The default url and credentials:
 * Default Karnak user: admin
 * Karnak DICOM listener port: 11119
 
-All the Karnak's parameters can be modified in the `.env` file and are described in [Environment Variables](#environment-variables).
+All the Karnak's parameters can be modified in the `karnak.env` file and are described in [Environment Variables](#environment-variables).
 
 Karnak contains third-party components:
 * Postgres database for the persistence of Karnak settings 
