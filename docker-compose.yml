@@ -3,7 +3,7 @@ version: '3.7'
 services:
   karnak:
     container_name: karnak
-    image: osirixfoundation/karnak:${KARNAK_VERSION}
+    image: osirixfoundation/karnak:local
     ports:
       - "${DICOM_LISTENER_PORT}:11119"
       - "${KARNAK_WEB_PORT}:8081"
@@ -44,7 +44,7 @@ services:
 
   mainzelliste:
     container_name: mainzelliste
-    image: osirixfoundation/karnak-mainzelliste:latest
+    image: osirixfoundation/karnak-mainzelliste:extid
     env_file: mainzelliste.env
     secrets:
       - mainzellisteDbPassword
@@ -54,6 +54,14 @@ services:
       - mainzellistePIDK3
     depends_on:
       - mainzelliste-db
+
+  node-dicom:
+    container_name: node-dicom
+    image: dcm4che/dcm4che-tools:5.22.6
+    entrypoint: ["storescp", "-b", "NODE:4444"]
+    networks:
+      default:
+        ipv4_address: 172.26.0.11
 
 secrets:
   karnak_login_password:
@@ -76,3 +84,8 @@ secrets:
 volumes:
   mainzelliste-db-data:
   karnak-db-data:
+
+networks:
+  default:
+    external:
+      name: karnak
