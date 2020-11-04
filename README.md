@@ -1,4 +1,24 @@
-# Karnak docker
+# Karnak docker - development environment
+
+## Configuration
+
+### Build  local Karnak
+
+`docker build -t osirixfoundation/karnak:local .`
+
+### Create the network
+
+`docker network create --driver=bridge --subnet=172.26.0.0/16 karnak`
+
+### Node DICOM
+
+* AETitle: NODE
+
+* Port: 4444
+
+* Hostname: 172.26.0.11
+
+---
 
 This repository allows you to launch [Karnak](https://github.com/OsiriX-Foundation/karnak) with docker-compose and all its dependencies. 
 This documentation is adapted to Linux operating systems.
