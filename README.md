@@ -4,9 +4,9 @@ This repository allows you to launch [Karnak](https://github.com/OsiriX-Foundati
 This documentation is adapted to Linux operating systems.
 
 The default url and credentials:
-* Karnak URL of the user interface: http://localhost:8081
+* Karnak URL of the user interface: http://localhost:8080
 * Default Karnak user: admin
-* Karnak DICOM listener port: 11119
+* Karnak DICOM listener port: 11112
 
 All the Karnak's parameters can be modified in the `karnak.env` file and are described in [Environment Variables](#environment-variables).
 

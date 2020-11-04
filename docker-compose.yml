@@ -3,10 +3,10 @@ version: '3.7'
 services:
   karnak:
     container_name: karnak
-    image: osirixfoundation/karnak:${KARNAK_VERSION}
+    image: osirixfoundation/karnak:0.9.2
     ports:
-      - "${DICOM_LISTENER_PORT}:11119"
-      - "${KARNAK_WEB_PORT}:8081"
+      - "11112:11119"
+      - "8080:8081"
     environment:
       KARNAK_WAIT_FOR: karnak-db:5432
     env_file: karnak.env
@@ -44,7 +44,7 @@ services:
 
   mainzelliste:
     container_name: mainzelliste
-    image: osirixfoundation/karnak-mainzelliste:latest
+    image: osirixfoundation/karnak-mainzelliste:extid
     env_file: mainzelliste.env
     secrets:
       - mainzellisteDbPassword
