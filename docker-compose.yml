@@ -20,7 +20,7 @@ services:
 
   karnak-db:
     container_name: karnak-db
-    image: postgres:12.1-alpine
+    image: postgres:12.4-alpine
     environment:
       - POSTGRES_DB=karnak
       - POSTGRES_USER=karnak
