@@ -24,11 +24,11 @@ This repository allows you to launch [Karnak](https://github.com/OsiriX-Foundati
 This documentation is adapted to Linux operating systems.
 
 The default url and credentials:
-* Karnak URL of the user interface: http://localhost:8081
+* Karnak URL of the user interface: http://localhost:8080
 * Default Karnak user: admin
-* Karnak DICOM listener port: 11119
+* Karnak DICOM listener port: 11112
 
-All the Karnak's parameters can be modified in the `.env` file and are described in [Environment Variables](#environment-variables).
+All the Karnak's parameters can be modified in the `karnak.env` file and are described in [Environment Variables](#environment-variables).
 
 Karnak contains third-party components:
 * Postgres database for the persistence of Karnak settings 
@@ -190,3 +190,20 @@ Password used for Karnak via file input. (alternative to `Karnak_LOGIN_PASSWORD`
 `KARNAK_WAIT_FOR`
 
 List of service to wait before start Karnak.
+
+`KARNAK_LOGS_MAX_FILE_SIZE`
+
+Maximum file size of general logs. Each time the current log file reaches maxFileSize before 
+the current time period ends, it will be archived with an increasing index, starting 
+at `KARNAK_LOGS_MIN_INDEX` value. The maxFileSize option can be specified in bytes, kilobytes, 
+megabytes or gigabytes by suffixing a numeric value with KB, MB and respectively GB. For example, 
+5000000, 5000KB, 5MB and 2GB are all valid values, with the first three being equivalent.
+(optional, default is `100MB`).
+
+`KARNAK_LOGS_MIN_INDEX`
+
+This option represents the lower bound for the window's logs index. (optional, default is `1`).
+
+`KARNAK_LOGS_MAX_INDEX`
+
+This option represents the upper bound for the window's logs index. (optional, default is `10`).

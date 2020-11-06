@@ -5,8 +5,8 @@ services:
     container_name: karnak
     image: osirixfoundation/karnak:local
     ports:
-      - "${DICOM_LISTENER_PORT}:11119"
-      - "${KARNAK_WEB_PORT}:8081"
+      - "11112:11119"
+      - "8080:8081"
     environment:
       KARNAK_WAIT_FOR: karnak-db:5432
     env_file: karnak.env
@@ -20,7 +20,7 @@ services:
 
   karnak-db:
     container_name: karnak-db
-    image: postgres:12.1-alpine
+    image: postgres:12.4-alpine
     environment:
       - POSTGRES_DB=karnak
       - POSTGRES_USER=karnak
