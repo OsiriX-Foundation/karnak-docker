@@ -59,9 +59,6 @@ services:
     container_name: node-dicom
     image: dcm4che/dcm4che-tools:5.22.6
     entrypoint: ["storescp", "-b", "NODE:4444"]
-    networks:
-      default:
-        ipv4_address: 172.26.0.11
 
 secrets:
   karnak_login_password:
@@ -84,8 +81,3 @@ secrets:
 volumes:
   mainzelliste-db-data:
   karnak-db-data:
-
-networks:
-  default:
-    external:
-      name: karnak

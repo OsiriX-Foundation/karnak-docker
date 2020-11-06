@@ -6,17 +6,13 @@
 
 `docker build -t osirixfoundation/karnak:local .`
 
-### Create the network
-
-`docker network create --driver=bridge --subnet=172.26.0.0/16 karnak`
-
 ### Node DICOM
 
-* AETitle: NODE
+* AETitle: `NODE`
 
-* Port: 4444
+* Port: `4444`
 
-* Hostname: 172.26.0.11
+* Hostname: `node-dicom`
 
 ---
 
