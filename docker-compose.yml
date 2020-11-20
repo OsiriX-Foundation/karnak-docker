@@ -17,6 +17,8 @@ services:
       - mainzellisteApiKey
       - karnak_hmac_key
       - karnak_login_password
+    extra_hosts:
+      - "demo.kheops.online:10.5.5.32"
 
   karnak-db:
     container_name: karnak-db
