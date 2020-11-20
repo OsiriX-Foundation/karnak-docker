@@ -1,45 +1,89 @@
-# KARNAK docker
+# Karnak docker
 
-This repository shows an example docker-compose to launch KARNAK with all his dependencies.
+This repository allows you to launch [Karnak](https://github.com/OsiriX-Foundation/karnak) with docker-compose and all its dependencies. 
+This documentation is adapted to Linux operating systems.
 
-The default url and credentials is defined below:
+The default url and credentials:
+* Karnak URL of the user interface: http://localhost:8080
+* Default Karnak user: admin
+* Karnak DICOM listener port: 11112
 
-* KARNAK URL user interface: http://localhost:8081
-* KARNAK URL DICOM listener: http://localhost:11119
-* Default KARNAK user: admin
+All the Karnak's parameters can be modified in the `karnak.env` file and are described in [Environment Variables](#environment-variables).
 
-The KARNAK's version, port of user interface and DICOM listener is defined in the file `.env`
-
-Currently KARNAK needs:
-* Postgres DataBase
-* Mainzelliste
+Karnak contains third-party components:
+* Postgres database for the persistence of Karnak settings 
+* Mainzelliste for the management of pseudonyms
 
 ## De-identification by profile
 
-The principle of de-identification with a profile pipe defined by KARNAK is explained here : [Profile](profileExample/)
+The principle of de-identification profile is explained [here](profileExample/).
 
-# Launch KARNAK
+# Launch Karnak
 
-KARNAK has been tested with:
+Karnak has been tested with [docker](https://docs.docker.com/install/) **19.03** and [docker-compose](https://docs.docker.com/compose/install/) **1.22**.
 
-* [docker](https://docs.docker.com/install/) version: **19.03**
-* [docker-compose](https://docs.docker.com/compose/install/) version: **1.22**
+1. Execute `generateSecrets.sh` to generate the secrets required by Karnak
+2. Adapt all the *.env files if necessary
+3. Start docker-compose with commands (or [create docker-compose service](#create-docker-compose-service)) 
 
-You can generate the secret and start KARNAK with the `start.sh` script present at the root of this repository. (No guarantee that it works on your machine)
+## Docker commands
 
-## docker-compose commands
+Commands from the root of this repository.
 
-* start a docker-compose: `docker-compose up`
-* stop a docker-compose: `docker-compose down`
-* stop and remove volume of a docker-compose: `docker-compose down -v`
-* logs a docker-compose: `docker-compose logs -f`
+* Update docker images ([version](https://hub.docker.com/r/osirixfoundation/karnak/tags) defined into .env): `docker-compose pull`
+* Start a docker-compose: `docker-compose up -d`
+* Stop a docker-compose: `docker-compose down`
+* Stop and remove volume of a docker-compose (reset all the data): `docker-compose down -v`
+* docker-compose logs: `docker-compose logs -f`
+* Karnak's logs: `sudo docker exec -it CONTAINERID bash`     
+`cd logs`
 
-## KARNAK's secrets
+## Create docker-compose service
 
-*These secrets are used in the proposed docker-compose, because it use the environment variables ending with _FILE (more details in 'KARNAK's environment variables')*
+Example of systemd service configuration with a docker-compose.yml file in the folder /opt/karnak (If it's another directory you have to adapt the script).
 
-Before to start the docker-compose, you need to make sure the secrets folder and the following secrets are defined:
+Instructions:
+* Go to /etc/systemd/system
+* Create the file ( eg: $ sudo touch karnak.service )
+* Copy and paste the config below (eg: $ sudo nano karnak.service):
 
+~~~
+# /etc/systemd/system/karnak.service 
+
+#########################
+#    KARNAK             #
+#    SERVICE            #	
+##########################
+
+[Unit]
+Description=Docker Compose KARNAK Service
+Requires=docker.service
+After=docker.service network.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=/opt/karnak
+ExecStart=/usr/local/bin/docker-compose up -d
+ExecStop=/usr/local/bin/docker-compose down
+TimeoutStartSec=0
+
+[Install]
+WantedBy=multi-user.target
+~~~
+
+Test the service:
+* $ systemctl start karnak.service
+* $ systemctl status karnak.service
+* $ systemctl enable karnak.service
+
+## Secrets
+
+You can generate the secrets with the `generateSecrets.sh` script available at the root of this repository (adapt the script to your system if necessary).
+
+Note: *These following secrets are stored in files and use the environment variables ending with _FILE (see 'Environment variables' below)*
+
+Before starting docker-compose make sure that the secrets folder and the following secrets exist:
 * `karnak_hmac_key`
 * `karnak_login_password`
 * `karnak_postgres_password`
@@ -49,35 +93,35 @@ Before to start the docker-compose, you need to make sure the secrets folder and
 * `mainzelliste_pid_k2`
 * `mainzelliste_pid_k3`
 
-## KARNAK's environment variables
+## Environment Variables
 
-To configure and analyze the docker environment variables used by KARNAK, please refer this links.
+To configure and analyze additional environment variables used by third-party components, please refer to the following links:
 * [docker hub postgres](https://hub.docker.com/_/postgres)
 * [docker hub mainzelliste](https://hub.docker.com/r/osirixfoundation/karnak-mainzelliste)
 
 `DB_USER`
 
-User of the KARNAK database (optional, default is `karnak`).
+User of the Karnak database (optional, default is `karnak`).
 
 `DB_USER_FILE`
 
-User of the KARNAK database via file input (alternative to `DB_USER`).
+User of the Karnak database via file input (alternative to `DB_USER`).
 
 `DB_PASSWORD`
 
-Password of the KARNAK database (optional, default is `karnak`).
+Password of the Karnak database (optional, default is `karnak`).
 
 `DB_PASSWORD_FILE`
 
-Password of the KARNAK database via file input (alternative to `DB_PASSWORD`).
+Password of the Karnak database via file input (alternative to `DB_PASSWORD`).
 
 `DB_NAME`
 
-Name of the KARNAK database (optional, default is `karnak`).
+Name of the Karnak database (optional, default is `karnak`).
 
 `DB_NAME_FILE`
 
-Name of the KARNAK database via file input (alternative to `DB_NAME`).
+Name of the Karnak database via file input (alternative to `DB_NAME`).
 
 `DB_HOST`
 
@@ -97,7 +141,7 @@ Port of the Mainzelliste host. (optional, default is `8080`).
 
 `MAINZELLISTE_ID_TYPES`
 
-Type of pseudonym to be created and sent.
+Type of pseudonym.
 
 `MAINZELLISTE_API_KEY`
 
@@ -105,24 +149,41 @@ The api key used to connect to Mainzelliste host (optional, default is `undefine
 
 `KARNAK_HMAC_KEY`
 
-The key used for the HMAC. This HMAC will be used for all the hash created by KARNAK
+The key used for the HMAC. This HMAC will be used for all the hash created by Karnak
 
 `KARNAK_HMAC_KEY_FILE`
 
-The key used for the HMAC via file input. (alternative to `KARNAK_HMAC_KEY`).
+The key used for the HMAC via file input. (alternative to `Karnak_HMAC_KEY`).
 
 `KARNAK_LOGIN_ADMIN`
 
-Login used for KARNAK. (optional, default is `admin`).
+Login used for Karnak. (optional, default is `admin`).
 
 `KARNAK_LOGIN_PASSWORD`
 
-Password used for KARNAK. (optional, default is `undefined`).
+Password used for Karnak. (optional, default is `undefined`).
 
 `KARNAK_LOGIN_PASSWORD_FILE`
 
-Password used for KARNAK via file input. (alternative to `KARNAK_LOGIN_PASSWORD`).
+Password used for Karnak via file input. (alternative to `Karnak_LOGIN_PASSWORD`).
 
 `KARNAK_WAIT_FOR`
 
-List of service to wait before start KARNAK.
+List of service to wait before start Karnak.
+
+`KARNAK_LOGS_MAX_FILE_SIZE`
+
+Maximum file size of general logs. Each time the current log file reaches maxFileSize before 
+the current time period ends, it will be archived with an increasing index, starting 
+at `KARNAK_LOGS_MIN_INDEX` value. The maxFileSize option can be specified in bytes, kilobytes, 
+megabytes or gigabytes by suffixing a numeric value with KB, MB and respectively GB. For example, 
+5000000, 5000KB, 5MB and 2GB are all valid values, with the first three being equivalent.
+(optional, default is `100MB`).
+
+`KARNAK_LOGS_MIN_INDEX`
+
+This option represents the lower bound for the window's logs index. (optional, default is `1`).
+
+`KARNAK_LOGS_MAX_INDEX`
+
+This option represents the upper bound for the window's logs index. (optional, default is `10`).
