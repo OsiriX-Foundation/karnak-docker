@@ -3,7 +3,7 @@ version: '3.7'
 services:
   karnak:
     container_name: karnak
-    image: osirixfoundation/karnak:0.9.2
+    image: osirixfoundation/karnak:0.9.3
     ports:
       - "11112:11119"
       - "8080:8081"
@@ -15,7 +15,6 @@ services:
     secrets:
       - postgres_karnak_password
       - mainzellisteApiKey
-      - karnak_hmac_key
       - karnak_login_password
 
   karnak-db:
@@ -58,8 +57,6 @@ services:
 secrets:
   karnak_login_password:
     file: secrets/karnak_login_password
-  karnak_hmac_key:
-    file: secrets/karnak_hmac_key
   postgres_karnak_password:
     file: secrets/karnak_postgres_password
   mainzellisteDbPassword:
