@@ -178,3 +178,18 @@ This option represents the lower bound for the window's logs index. (optional, d
 `KARNAK_LOGS_MAX_INDEX`
 
 This option represents the upper bound for the window's logs index. (optional, default is `10`).
+
+`KARNAK_CLINICAL_LOGS_MAX_FILE_SIZE=100MB`
+
+Maximum file size of clinical logs. Each time the current log file reaches maxFileSize before 
+the current time period ends, it will be archived with an increasing index, starting at `KARNAK_CLINICAL_LOGS_MIN_INDEX` value.
+
+(optional, default is `100MB`).
+
+`KARNAK_CLINICAL_LOGS_MIN_INDEX=1`
+
+This option represents the lower bound for the window's clinical logs index. (optional, default is `1`).
+
+`KARNAK_CLINICAL_LOGS_MAX_INDEX=10`
+
+This option represents the upper bound for the window's clinical logs index. (optional, default is `10`).
