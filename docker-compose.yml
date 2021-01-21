@@ -19,6 +19,7 @@ services:
       - reverseproxy
       - karnak-data
       - mainzelliste
+      - kheops
 
   karnak-db:
     container_name: karnak-db
@@ -109,3 +110,6 @@ networks:
       driver: default
       config:
         - subnet: "172.20.103.0/24"
+  kheops:
+    external:
+      name: kheops_kheops_network
