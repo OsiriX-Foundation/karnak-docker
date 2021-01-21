@@ -87,9 +87,25 @@ volumes:
 networks:
   reverseproxy:
     driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.17.100.0/24"
   karnak-data:
     driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.17.101.0/24"
   mainzelliste:
     driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.17.102.0/24"
   mainzelliste-data:
     driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.17.103.0/24"
