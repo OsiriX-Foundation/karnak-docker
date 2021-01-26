@@ -14,7 +14,7 @@ then
   exit 1
 fi
 
-secretfiles=("karnak_hmac_key" "karnak_postgres_password" "mainzelliste_api_key" "mainzelliste_postgres_password")
+secretfiles=("karnak_postgres_password" "mainzelliste_api_key" "mainzelliste_postgres_password")
 
 secretpath="secrets/"
 

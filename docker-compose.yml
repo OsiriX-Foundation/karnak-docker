@@ -19,7 +19,6 @@ services:
     secrets:
       - postgres_karnak_password
       - mainzellisteApiKey
-      - karnak_hmac_key
       - karnak_login_password
     networks:
       - reverseproxy
@@ -73,8 +72,6 @@ services:
 secrets:
   karnak_login_password:
     file: secrets/karnak_login_password
-  karnak_hmac_key:
-    file: secrets/karnak_hmac_key
   postgres_karnak_password:
     file: secrets/karnak_postgres_password
   mainzellisteDbPassword:
