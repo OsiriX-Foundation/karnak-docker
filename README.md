@@ -84,7 +84,6 @@ You can generate the secrets with the `generateSecrets.sh` script available at t
 Note: *These following secrets are stored in files and use the environment variables ending with _FILE (see 'Environment variables' below)*
 
 Before starting docker-compose make sure that the secrets folder and the following secrets exist:
-* `karnak_hmac_key`
 * `karnak_login_password`
 * `karnak_postgres_password`
 * `mainzelliste_api_key`
