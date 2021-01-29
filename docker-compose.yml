@@ -12,10 +12,18 @@ services:
     env_file: karnak.env
     depends_on:
       - karnak-db
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
     secrets:
       - postgres_karnak_password
       - mainzellisteApiKey
       - karnak_login_password
+    networks:
+      - reverseproxy
+      - karnak-data
+      - mainzelliste
 
   karnak-db:
     container_name: karnak-db
@@ -28,6 +36,8 @@ services:
       - karnak-db-data:/var/lib/postgresql/data
     secrets:
       - postgres_karnak_password
+    networks:
+      - karnak-data
 
   mainzelliste-db:
     container_name: mainzelliste-db
@@ -40,6 +50,8 @@ services:
       - mainzelliste-db-data:/var/lib/postgresql/data
     secrets:
       - mainzellisteDbPassword
+    networks:
+      - mainzelliste-data
 
   mainzelliste:
     container_name: mainzelliste
@@ -53,6 +65,9 @@ services:
       - mainzellistePIDK3
     depends_on:
       - mainzelliste-db
+    networks:
+      - mainzelliste
+      - mainzelliste-data
 
 secrets:
   karnak_login_password:
@@ -73,3 +88,8 @@ secrets:
 volumes:
   mainzelliste-db-data:
   karnak-db-data:
+networks:
+  reverseproxy:
+  karnak-data:
+  mainzelliste:
+  mainzelliste-data:
