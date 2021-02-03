@@ -5,7 +5,7 @@ services:
     container_name: karnak
     image: osirixfoundation/karnak:0.9.2
     ports:
-      - "11112:11119"
+      - "11119:11119"
     environment:
       KARNAK_WAIT_FOR: karnak-db:5432
     env_file: karnak.env
