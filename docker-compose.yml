@@ -3,7 +3,7 @@ version: '3.7'
 services:
   karnak:
     container_name: karnak
-    image: osirixfoundation/karnak:latest
+    image: osirixfoundation/karnak:v0.9.3
     ports:
       - "11119:11119"
       - "80:8081"
@@ -12,15 +12,20 @@ services:
     env_file: karnak.env
     depends_on:
       - karnak-db
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
     secrets:
       - postgres_karnak_password
       - mainzellisteApiKey
-      - karnak_hmac_key
       - karnak_login_password
     extra_hosts:
       - "demo.kheops.online:10.5.5.32"
     networks:
-      - karnak_network
+      - reverseproxy
+      - karnak-data
+      - mainzelliste
 
   karnak-db:
     container_name: karnak-db
@@ -34,7 +39,7 @@ services:
     secrets:
       - postgres_karnak_password
     networks:
-      - karnak_network
+      - karnak-data
 
   mainzelliste-db:
     container_name: mainzelliste-db
@@ -48,7 +53,7 @@ services:
     secrets:
       - mainzellisteDbPassword
     networks:
-      - karnak_network
+      - mainzelliste-data
 
   mainzelliste:
     container_name: mainzelliste
@@ -63,13 +68,12 @@ services:
     depends_on:
       - mainzelliste-db
     networks:
-      - karnak_network
+      - mainzelliste
+      - mainzelliste-data
 
 secrets:
   karnak_login_password:
     file: secrets/karnak_login_password
-  karnak_hmac_key:
-    file: secrets/karnak_hmac_key
   postgres_karnak_password:
     file: secrets/karnak_postgres_password
   mainzellisteDbPassword:
@@ -88,9 +92,27 @@ volumes:
   karnak-db-data:
 
 networks:
-  karnak_network:
+  reverseproxy:
     driver: bridge
     ipam:
       driver: default
       config:
-        - subnet: "172.16.251.0/24"
+        - subnet: "172.20.100.0/24"
+  karnak-data:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.20.101.0/24"
+  mainzelliste:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.20.102.0/24"
+  mainzelliste-data:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.20.103.0/24"
