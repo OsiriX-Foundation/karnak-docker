@@ -3,7 +3,7 @@ version: '3.7'
 services:
   karnak:
     container_name: karnak
-    image: osirixfoundation/karnak:0.9.2
+    image: osirixfoundation/karnak:v0.9.3
     ports:
       - "11119:11119"
     environment:
@@ -11,6 +11,10 @@ services:
     env_file: karnak.env
     depends_on:
       - karnak-db
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
     secrets:
       - postgres_karnak_password
       - mainzellisteApiKey
