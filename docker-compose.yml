@@ -9,6 +9,8 @@ services:
     environment:
       KARNAK_WAIT_FOR: karnak-db:5432
     env_file: karnak.env
+    volumes:
+      - karnak-logs:/app/logs
     depends_on:
       - karnak-db
     logging:
@@ -88,6 +90,7 @@ secrets:
 volumes:
   mainzelliste-db-data:
   karnak-db-data:
+  karnak-logs:
 
 networks:
   reverseproxy:
