@@ -186,3 +186,11 @@ This option represents the lower bound for the window's logs index. (optional, d
 `KARNAK_LOGS_MAX_INDEX`
 
 This option represents the upper bound for the window's logs index. (optional, default is `10`).
+
+`IDP`
+
+This option allow to connect identity provider. When this environment variable has the value `oidc`, the following environment variables will configure the OpenID Connect identity provider. Any other value will load the in memory user configuration. (optional, default is `undefined`).
+
+* `OIDC_CLIENT_ID` Client id of the identity provider (optional, default is `undefined`).
+* `OIDC_CLIENT_SECRET` Client secret of the identity provider (optional, default is `undefined`).
+* `OIDC_ISSUER_URI` Issuer URI of the identity provider (optional, default is `undefined`).
