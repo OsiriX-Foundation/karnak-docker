@@ -158,10 +158,6 @@ Password used for Karnak. (optional, default is `undefined`).
 
 Password used for Karnak via file input. (alternative to `Karnak_LOGIN_PASSWORD`).
 
-`KARNAK_WAIT_FOR`
-
-List of service to wait before start Karnak.
-
 `KARNAK_LOGS_MAX_FILE_SIZE`
 
 Maximum file size of general logs. Each time the current log file reaches maxFileSize before 
@@ -193,3 +189,6 @@ This option represents the lower bound for the window's clinical logs index. (op
 `KARNAK_CLINICAL_LOGS_MAX_INDEX=10`
 
 This option represents the upper bound for the window's clinical logs index. (optional, default is `10`).
+
+`LOGBACK_CONFIGURATION_FILE`
+
