@@ -146,14 +146,6 @@ Type of pseudonym.
 
 The api key used to connect to Mainzelliste host (optional, default is `undefined`)
 
-`KARNAK_HMAC_KEY`
-
-The key used for the HMAC. This HMAC will be used for all the hash created by Karnak
-
-`KARNAK_HMAC_KEY_FILE`
-
-The key used for the HMAC via file input. (alternative to `Karnak_HMAC_KEY`).
-
 `KARNAK_LOGIN_ADMIN`
 
 Login used for Karnak. (optional, default is `admin`).
