@@ -3,7 +3,7 @@ version: '3.7'
 services:
   karnak:
     container_name: karnak
-    image: osirixfoundation/karnak:v0.9.4
+    image: osirixfoundation/karnak:v0.9.5
     ports:
       - "11112:11119"
       - "8080:8081"
@@ -20,6 +20,7 @@ services:
       - postgres_karnak_password
       - mainzellisteApiKey
       - karnak_login_password
+      - oidc_client_secret
     networks:
       - reverseproxy
       - karnak-data
@@ -74,6 +75,8 @@ secrets:
     file: secrets/karnak_login_password
   postgres_karnak_password:
     file: secrets/karnak_postgres_password
+  oidc_client_secret:
+    file: secrets/oidc_client_secret
   mainzellisteDbPassword:
     file: secrets/mainzelliste_postgres_password
   mainzellisteApiKey:

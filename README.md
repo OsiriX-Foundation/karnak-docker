@@ -192,3 +192,11 @@ This option represents the upper bound for the window's clinical logs index. (op
 
 `LOGBACK_CONFIGURATION_FILE`
 
+
+`IDP`
+
+This option allow to connect identity provider. When this environment variable has the value `oidc`, the following environment variables will configure the OpenID Connect identity provider. Any other value will load the in memory user configuration. (optional, default is `undefined`).
+
+* `OIDC_CLIENT_ID` Client id of the identity provider (optional, default is `undefined`).
+* `OIDC_CLIENT_SECRET` Client secret of the identity provider (optional, default is `undefined`).
+* `OIDC_ISSUER_URI` Issuer URI of the identity provider (optional, default is `undefined`).
