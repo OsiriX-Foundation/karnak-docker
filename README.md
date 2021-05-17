@@ -192,6 +192,7 @@ This option represents the upper bound for the window's clinical logs index. (op
 
 `LOGBACK_CONFIGURATION_FILE`
 
+Path of Logback file configuration, it will override the default log file (optional)
 
 `IDP`
 
