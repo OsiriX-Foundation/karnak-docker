@@ -201,3 +201,5 @@ This option allow to connect identity provider. When this environment variable h
 * `OIDC_CLIENT_ID` Client id of the identity provider (optional, default is `undefined`).
 * `OIDC_CLIENT_SECRET` Client secret of the identity provider (optional, default is `undefined`).
 * `OIDC_ISSUER_URI` Issuer URI of the identity provider (optional, default is `undefined`).
+
+For other environment variables of the DICOM Gateway, see this [configuration file](karnak.env).
