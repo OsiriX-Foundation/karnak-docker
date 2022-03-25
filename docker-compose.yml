@@ -3,7 +3,7 @@ version: '3.7'
 services:
   karnak:
     container_name: karnak
-    image: osirixfoundation/karnak:v1.0.0
+    image: osirixfoundation/karnak:v1.0.1
     ports:
       - "11112:11119"
       - "8080:8081"
