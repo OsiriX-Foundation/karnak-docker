@@ -3,15 +3,17 @@ version: '3.7'
 services:
   karnak:
     container_name: karnak
-    image: osirixfoundation/karnak:v1.0.1
+    image: osirixfoundation/karnak:v1.0.2
     ports:
       - "11112:11119"
       - "8080:8081"
     environment:
       KARNAK_WAIT_FOR: karnak-db:5432
+      REDIS_HOST: karnak-cache
     env_file: karnak.env
     depends_on:
       - karnak-db
+      - karnak-cache
     logging:
       driver: json-file
       options:
@@ -24,6 +26,12 @@ services:
       - reverseproxy
       - karnak-data
       - mainzelliste
+
+  karnak-cache:
+    container_name: karnak-cache
+    image: redis:6.0.16-alpine3.15
+    networks:
+      - karnak-data
 
   karnak-db:
     container_name: karnak-db
@@ -90,6 +98,7 @@ secrets:
 volumes:
   mainzelliste-db-data:
   karnak-db-data:
+
 networks:
   reverseproxy:
   karnak-data:
