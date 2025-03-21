@@ -1,9 +1,7 @@
-version: '3.7'
-
 services:
   karnak:
     container_name: karnak
-    image: osirixfoundation/karnak:v1.0.3
+    image: osirixfoundation/karnak:v1.1.0
     ports:
       - "11112:11119"
       - "8080:8081"
@@ -20,22 +18,19 @@ services:
         max-size: "10m"
     secrets:
       - postgres_karnak_password
-      - mainzellisteApiKey
       - karnak_login_password
     networks:
-      - reverseproxy
       - karnak-data
-      - mainzelliste
 
   karnak-cache:
     container_name: karnak-cache
-    image: redis:6.0.16-alpine3.15
+    image: redis:7-alpine
     networks:
       - karnak-data
 
   karnak-db:
     container_name: karnak-db
-    image: postgres:12.4-alpine
+    image: postgres:17-alpine
     environment:
       - POSTGRES_DB=karnak
       - POSTGRES_USER=karnak
@@ -47,36 +42,6 @@ services:
     networks:
       - karnak-data
 
-  mainzelliste-db:
-    container_name: mainzelliste-db
-    image: postgres:9.5-alpine
-    environment:
-      - POSTGRES_DB=mainzelliste
-      - POSTGRES_USER=mainzelliste
-      - POSTGRES_PASSWORD_FILE=/run/secrets/mainzellisteDbPassword
-    volumes:
-      - mainzelliste-db-data:/var/lib/postgresql/data
-    secrets:
-      - mainzellisteDbPassword
-    networks:
-      - mainzelliste-data
-
-  mainzelliste:
-    container_name: mainzelliste
-    image: osirixfoundation/karnak-mainzelliste:extid
-    env_file: mainzelliste.env
-    secrets:
-      - mainzellisteDbPassword
-      - mainzellisteApiKey
-      - mainzellistePIDK1
-      - mainzellistePIDK2
-      - mainzellistePIDK3
-    depends_on:
-      - mainzelliste-db
-    networks:
-      - mainzelliste
-      - mainzelliste-data
-
 secrets:
   karnak_login_password:
     file: secrets/karnak_login_password
@@ -84,23 +49,9 @@ secrets:
     file: secrets/karnak_postgres_password
   oidc_client_secret:
     file: secrets/oidc_client_secret
-  mainzellisteDbPassword:
-    file: secrets/mainzelliste_postgres_password
-  mainzellisteApiKey:
-    file: secrets/mainzelliste_api_key
-  mainzellistePIDK1:
-    file: secrets/mainzelliste_pid_k1
-  mainzellistePIDK2:
-    file: secrets/mainzelliste_pid_k2
-  mainzellistePIDK3:
-    file: secrets/mainzelliste_pid_k3
 
 volumes:
-  mainzelliste-db-data:
   karnak-db-data:
 
 networks:
-  reverseproxy:
   karnak-data:
-  mainzelliste:
-  mainzelliste-data:

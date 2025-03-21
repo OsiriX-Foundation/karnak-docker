@@ -12,15 +12,15 @@ All the Karnak's parameters can be modified in the `karnak.env` file and are des
 
 Karnak contains third-party components:
 * Postgres database for the persistence of Karnak settings 
-* Mainzelliste for the management of pseudonyms
+* Redis for the cache of some values
 
 ## De-identification by profile
 
-The principle of de-identification profile is explained [here](profileExample/).
+The principle of de-identification profile is explained [here](https://osirix-foundation.github.io/karnak-documentation/en/profiles/).
 
 # Launch Karnak
 
-Karnak has been tested with [docker](https://docs.docker.com/install/) **19.03** and [docker-compose](https://docs.docker.com/compose/install/) **1.22**.
+Minimum docker version: 20.10
 
 1. Execute `generateSecrets.sh` to generate the secrets required by Karnak
 2. Adapt all the *.env files if necessary
@@ -31,10 +31,10 @@ Karnak has been tested with [docker](https://docs.docker.com/install/) **19.03**
 Commands from the root of this repository.
 
 * Update docker images ([version](https://hub.docker.com/r/osirixfoundation/karnak/tags) defined into .env): `docker-compose pull`
-* Start a docker-compose: `docker-compose up -d`
-* Stop a docker-compose: `docker-compose down`
-* Stop and remove volume of a docker-compose (reset all the data): `docker-compose down -v`
-* docker-compose logs: `docker-compose logs -f`
+* Start: `docker compose up -d`
+* Stop: `docker compose down`
+* Stop and remove volume (reset all the data): `docker compose down -v`
+* docker-compose logs: `docker compose logs -f`
 * Karnak's logs: `sudo docker exec -it CONTAINERID bash`     
 `cd logs`
 
@@ -86,17 +86,11 @@ Note: *These following secrets are stored in files and use the environment varia
 Before starting docker-compose make sure that the secrets folder and the following secrets exist:
 * `karnak_login_password`
 * `karnak_postgres_password`
-* `mainzelliste_api_key`
-* `mainzelliste_postgres_password`
-* `mainzelliste_pid_k1`
-* `mainzelliste_pid_k2`
-* `mainzelliste_pid_k3`
 
 ## Environment Variables
 
 To configure and analyze additional environment variables used by third-party components, please refer to the following links:
 * [docker hub postgres](https://hub.docker.com/_/postgres)
-* [docker hub mainzelliste](https://hub.docker.com/r/osirixfoundation/karnak-mainzelliste)
 
 `DB_USER`
 
@@ -130,21 +124,6 @@ Hostname/IP Address of the PostgreSQL host. (optional, default is `localhost`).
 
 Port of the PostgreSQL host (optional, default is `5432`)
 
-`MAINZELLISTE_HOSTNAME`
-
-Hostname/IP Address of the Mainzelliste host. (optional, default is `localhost`).
-
-`MAINZELLISTE_HTTP_PORT`
-
-Port of the Mainzelliste host. (optional, default is `8080`).
-
-`MAINZELLISTE_ID_TYPES`
-
-Type of pseudonym.
-
-`MAINZELLISTE_API_KEY`
-
-The api key used to connect to Mainzelliste host (optional, default is `undefined`)
 
 `KARNAK_LOGIN_ADMIN`
 
