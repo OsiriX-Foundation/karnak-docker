@@ -20,7 +20,7 @@ The principle of de-identification profile is explained [here](https://osirix-fo
 
 # Launch Karnak
 
-Minimum docker version: 20.10
+Minimum docker version required: 20.10
 
 1. Execute `generateSecrets.sh` to generate the secrets required by Karnak
 2. Adapt all the *.env files if necessary
@@ -30,13 +30,11 @@ Minimum docker version: 20.10
 
 Commands from the root of this repository.
 
-* Update docker images ([version](https://hub.docker.com/r/osirixfoundation/karnak/tags) defined into .env): `docker-compose pull`
+* Update docker images ([version](https://hub.docker.com/r/osirixfoundation/karnak/tags) defined into .env): `docker compose pull`
 * Start: `docker compose up -d`
 * Stop: `docker compose down`
 * Stop and remove volume (reset all the data): `docker compose down -v`
 * docker-compose logs: `docker compose logs -f`
-* Karnak's logs: `sudo docker exec -it CONTAINERID bash`     
-`cd logs`
 
 ## Create docker-compose service
 
@@ -64,8 +62,8 @@ After=docker.service network.target
 Type=oneshot
 RemainAfterExit=yes
 WorkingDirectory=/opt/karnak
-ExecStart=/usr/local/bin/docker-compose up -d
-ExecStop=/usr/local/bin/docker-compose down
+ExecStart=/usr/local/bin/docker compose up -d
+ExecStop=/usr/local/bin/docker compose down
 TimeoutStartSec=0
 
 [Install]
