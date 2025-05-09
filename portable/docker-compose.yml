@@ -1,0 +1,62 @@
+services:
+  karnak:
+    container_name: ${COMPOSE_PROJECT_NAME}_karnak
+    image: osirixfoundation/karnak:v1.1.0
+    ports:
+      - "11112:11119"
+      - "8080:8081"
+    environment:
+      KARNAK_WAIT_FOR: karnak-db:5432
+      REDIS_HOST: karnak-cache
+    env_file: karnak.env
+    depends_on:
+      - karnak-db
+      - karnak-cache
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+    secrets:
+      - postgres_karnak_password
+      - karnak_login_password
+    networks:
+      - karnak-data
+    volumes:
+      - ./data/karnak_logs:/app/logs
+    user: "${USER_ID:-1000}:${GROUP_ID:-1000}"
+
+  karnak-cache:
+    container_name: ${COMPOSE_PROJECT_NAME}_karnak-cache
+    image: redis:7-alpine
+    networks:
+      - karnak-data
+
+  karnak-db:
+    container_name: ${COMPOSE_PROJECT_NAME}_karnak-db
+    image: postgres:17-alpine
+    environment:
+      - POSTGRES_DB=karnak
+      - POSTGRES_USER=karnak
+      - POSTGRES_PASSWORD_FILE=/run/secrets/postgres_karnak_password
+    volumes:
+      - ./data/karnak-db-data:/var/lib/postgresql/data
+    secrets:
+      - postgres_karnak_password
+    networks:
+      - karnak-data
+    user: "${USER_ID:-1000}:${GROUP_ID:-1000}"
+
+
+secrets:
+  karnak_login_password:
+    file: ./secrets/karnak_login_password
+  postgres_karnak_password:
+    file: ./secrets/karnak_postgres_password
+  oidc_client_secret:
+    file: ./secrets/oidc_client_secret
+
+volumes:
+  karnak-db-data:
+
+networks:
+  karnak-data:
