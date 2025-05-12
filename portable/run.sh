@@ -13,7 +13,7 @@ download_compose() {
     mkdir -p "$(dirname "$COMPOSE_BIN")"
 
     # Fetch the latest release from GitHub
-    latest_release=$(curl -s https://api.github.com/repos/docker/compose/releases/latest | grep -oP '"tag_name": "\K(.*)(?=")')
+    latest_release=$(curl -s https://api.github.com/repos/docker/compose/releases/latest | grep -o '"tag_name": "[^"]*' | cut -d'"' -f4)
 
     if [ -z "$latest_release" ]; then
         echo "Error: Could not fetch the latest release of Docker Compose. Please check your internet connection."
@@ -25,7 +25,10 @@ download_compose() {
     # Normalize OS name and architecture
     os_name=$(uname -s | tr '[:upper:]' '[:lower:]')  # Convert to lowercase (e.g., linux)
     arch_name=$(uname -m)                             # Architecture (e.g., x86_64)
-
+    # Handle Apple Silicon (M1/M2) architecture
+    if [ "$arch_name" = "arm64" ]; then
+        arch_name="aarch64"
+    fi
 
     # Download Docker Compose for the current platform
     echo "Downloading: https://github.com/docker/compose/releases/download/${latest_release}/docker-compose-${os_name}-${arch_name}"
