@@ -31,13 +31,31 @@ echo "Generating secrets..."
 # Create secrets directory if it doesn't exist
 mkdir -p "$secretpath"
 
-# Pull the busybox Docker image to use for generating secrets
-docker pull busybox
+# Function to generate random base64 string cross-platform
+generate_random_base64() {
+    case "$(uname -s)" in
+        Darwin)
+            # macOS
+            dd if=/dev/urandom bs=1 count=32 2>/dev/null | base64
+            ;;
+        MINGW*|CYGWIN*)
+            # Windows - use built-in certutil as alternative
+            certutil -f -encodehex -f NUL out.tmp 32 > nul 2>&1 || true
+            certutil -encode -f out.tmp out.b64 > nul 2>&1 || true
+            # Clean up temporary files and format output
+            head -n 2 out.b64 | tail -n 1
+            rm -f out.tmp out.b64 2>/dev/null || true
+            ;;
+        Linux|*)
+            # Linux and others
+            dd if=/dev/urandom bs=1 count=32 2>/dev/null | base64 -w 0
+            ;;
+    esac
+}
 
 # Generate random secrets
 for secretfile in "${secretfiles[@]}"; do
-  # Use macOS/Linux compatible base64 (without line wrapping), with Windows compatibility for paths
-  docker run --rm busybox sh -c "dd if=/dev/urandom bs=1 count=32 2>/dev/null | base64 -w 0" > "$(resolve_path "$secretpath/$secretfile")"
+    generate_random_base64 > "$(resolve_path "$secretpath/$secretfile")"
 done
 
 # Prompt the user to set the web portal password

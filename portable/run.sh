@@ -7,6 +7,15 @@ COMPOSE_FILE="./docker-compose.yml"
 SECRETS_DIR="./secrets"
 GENERATE_SECRETS_SCRIPT="./generateSecrets.sh"
 
+# Define binary suffix based on OS
+case "$(uname -s)" in
+    MINGW*|CYGWIN*)
+        # Define the correct binary path with suffix
+        COMPOSE_BIN="${COMPOSE_BIN}.exe"
+        ;;
+esac
+
+
 # Function to handle OS-specific path resolution (for Windows Git Bash)
 resolve_path() {
     case "$(uname -s)" in
@@ -49,15 +58,6 @@ download_compose() {
     if [ "$arch_name" = "arm64" ]; then
         arch_name="aarch64"  # Handle Apple Silicon (M1/M2) architecture
     fi
-
-    # Add ".exe" suffix for Windows
-    binary_suffix=""
-    if [ "$os_name" = "windows" ]; then
-        binary_suffix=".exe"
-    fi
-
-    # Define the correct binary path with suffix
-    COMPOSE_BIN="${COMPOSE_BIN}${binary_suffix}"
 
     # Download Docker Compose for the current platform with correct suffix
     echo "Downloading: https://github.com/docker/compose/releases/download/${latest_release}/docker-compose-${os_name}-${arch_name}${binary_suffix}"
@@ -142,10 +142,17 @@ case "$1" in
         "$COMPOSE_BIN" -f "$(resolve_path "$COMPOSE_FILE")" down --volumes
         echo "All volumes and data have been deleted."
 
-        # Remove the secrets folder if it exists
+        # Remove the data folder if it exists
         if [ -d "$SECRETS_DIR" ]; then
-            echo "Removing the secrets folder..."
+            echo "Removing the data folder..."
             rm -rf "$SECRETS_DIR"
+            echo "Data folder removed."
+        fi
+
+        # Remove the secrets folder if it exists
+        if [ -d "./data" ]; then
+            echo "Removing the secrets folder..."
+            rm -rf "./data"
             echo "Secrets folder removed."
         fi
         ;;
