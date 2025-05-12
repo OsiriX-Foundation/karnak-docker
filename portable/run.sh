@@ -7,7 +7,20 @@ COMPOSE_FILE="./docker-compose.yml"
 SECRETS_DIR="./secrets"
 GENERATE_SECRETS_SCRIPT="./generateSecrets.sh"
 
-# Define helper function for downloading docker-compose
+# Function to handle OS-specific path resolution (for Windows Git Bash)
+resolve_path() {
+    case "$(uname -s)" in
+        MINGW*|CYGWIN*)
+            # Convert paths to Windows format for tools that require it
+            printf "%s\n" "$(cygpath -w "$1")"
+            ;;
+        *)
+            printf "%s\n" "$1"
+            ;;
+    esac
+}
+
+# Function to download Docker Compose
 download_compose() {
     echo "Docker Compose binary not found. Downloading..."
     mkdir -p "$(dirname "$COMPOSE_BIN")"
@@ -16,23 +29,39 @@ download_compose() {
     latest_release=$(curl -s https://api.github.com/repos/docker/compose/releases/latest | grep -o '"tag_name": "[^"]*' | cut -d'"' -f4)
 
     if [ -z "$latest_release" ]; then
-        echo "Error: Could not fetch the latest release of Docker Compose. Please check your internet connection."
+        echo "Error: Could not fetch the latest release of Docker Compose."
         exit 1
     fi
 
     echo "Latest Docker Compose version: $latest_release"
 
     # Normalize OS name and architecture
-    os_name=$(uname -s | tr '[:upper:]' '[:lower:]')  # Convert to lowercase (e.g., linux)
-    arch_name=$(uname -m)                             # Architecture (e.g., x86_64)
-    # Handle Apple Silicon (M1/M2) architecture
+    case "$(uname -s)" in
+        MINGW*|CYGWIN*)
+            os_name="windows"
+            ;;
+        *)
+            os_name=$(uname -s | tr '[:upper:]' '[:lower:]')  # Convert to lowercase
+            ;;
+    esac
+
+    arch_name=$(uname -m)  # Architecture (e.g., x86_64)
     if [ "$arch_name" = "arm64" ]; then
-        arch_name="aarch64"
+        arch_name="aarch64"  # Handle Apple Silicon (M1/M2) architecture
     fi
 
-    # Download Docker Compose for the current platform
-    echo "Downloading: https://github.com/docker/compose/releases/download/${latest_release}/docker-compose-${os_name}-${arch_name}"
-    curl -L "https://github.com/docker/compose/releases/download/${latest_release}/docker-compose-${os_name}-${arch_name}" -o "$COMPOSE_BIN"
+    # Add ".exe" suffix for Windows
+    binary_suffix=""
+    if [ "$os_name" = "windows" ]; then
+        binary_suffix=".exe"
+    fi
+
+    # Define the correct binary path with suffix
+    COMPOSE_BIN="${COMPOSE_BIN}${binary_suffix}"
+
+    # Download Docker Compose for the current platform with correct suffix
+    echo "Downloading: https://github.com/docker/compose/releases/download/${latest_release}/docker-compose-${os_name}-${arch_name}${binary_suffix}"
+    curl -L "https://github.com/docker/compose/releases/download/${latest_release}/docker-compose-${os_name}-${arch_name}${binary_suffix}" -o "$COMPOSE_BIN"
     chmod +x "$COMPOSE_BIN"
     echo "Docker Compose downloaded successfully: $COMPOSE_BIN"
 }
@@ -80,13 +109,24 @@ case "$1" in
         mkdir -p ./data/karnak-db-data
         mkdir -p ./data/karnak_logs
         echo "Starting the application in a detached mode..."
-        USER_ID=$(id -u) GROUP_ID=$(id -g) "$COMPOSE_BIN" -f "$COMPOSE_FILE" up -d
+
+        # Windows Git Bash does not support `id`, so handle it gracefully
+        if command -v id &>/dev/null; then
+            USER_ID=$(id -u)
+            GROUP_ID=$(id -g)
+        else
+            echo "Warning: 'id' command not found. Defaulting user and group IDs to 1000."
+            USER_ID=1000
+            GROUP_ID=1000
+        fi
+
+        USER_ID=$USER_ID GROUP_ID=$GROUP_ID "$COMPOSE_BIN" -f "$(resolve_path "$COMPOSE_FILE")" up -d
         echo "Application started."
         ;;
     
     stop)
         echo "Stopping the application..."
-        "$COMPOSE_BIN" -f "$COMPOSE_FILE" down
+        "$COMPOSE_BIN" -f "$(resolve_path "$COMPOSE_FILE")" down
         echo "Application stopped."
         ;;
     
@@ -99,7 +139,7 @@ case "$1" in
         fi
 
         echo "Stopping the application and cleaning up volumes..."
-        "$COMPOSE_BIN" -f "$COMPOSE_FILE" down --volumes
+        "$COMPOSE_BIN" -f "$(resolve_path "$COMPOSE_FILE")" down --volumes
         echo "All volumes and data have been deleted."
 
         # Remove the secrets folder if it exists
@@ -107,13 +147,10 @@ case "$1" in
             echo "Removing the secrets folder..."
             rm -rf "$SECRETS_DIR"
             echo "Secrets folder removed."
-        else
-            echo "Secrets folder does not exist. Skipping."
         fi
         ;;
     
     *)
-        echo "Invalid option!"
         usage
         ;;
 esac
