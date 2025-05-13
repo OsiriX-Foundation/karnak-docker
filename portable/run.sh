@@ -2,19 +2,67 @@
 set -e
 
 # Define paths
-COMPOSE_BIN="./docker/docker-compose"
+PORTABLE_DIR="./docker"
 COMPOSE_FILE="./docker-compose.yml"
 SECRETS_DIR="./secrets"
 GENERATE_SECRETS_SCRIPT="./generateSecrets.sh"
 
-# Define binary suffix based on OS
+# Define binary paths based on OS
 case "$(uname -s)" in
     MINGW*|CYGWIN*)
-        # Define the correct binary path with suffix
-        COMPOSE_BIN="${COMPOSE_BIN}.exe"
+        DOCKER_BIN="${PORTABLE_DIR}/docker.exe"
+        COMPOSE_BIN="${PORTABLE_DIR}/docker-compose.exe"
+        DOCKERD_BIN="${PORTABLE_DIR}/dockerd.exe"
+        ;;
+    *)
+        DOCKER_BIN="${PORTABLE_DIR}/docker"
+        COMPOSE_BIN="${PORTABLE_DIR}/docker-compose"
+        DOCKERD_BIN="${PORTABLE_DIR}/dockerd"
         ;;
 esac
 
+# Helper function to display usage
+usage() {
+    echo "Usage: $0 {start|stop|clean}"
+    echo
+    echo "start - Start the application (in a detached process). Downloads required binaries if missing."
+    echo "stop  - Stop the application"
+    echo "clean - Stop the application, remove all volumes, and delete the secrets folder"
+    echo
+    exit 1
+}
+
+# Function to normalize OS and architecture names
+get_platform_info() {
+    case "$(uname -s)" in
+        MINGW*|CYGWIN*)
+            OS_NAME="windows"
+            BINARY_SUFFIX=".exe"
+            ;;
+        Darwin)
+            OS_NAME="darwin"
+            BINARY_SUFFIX=""
+            ;;
+        *)
+            OS_NAME="linux"
+            BINARY_SUFFIX=""
+            ;;
+    esac
+
+    ARCH_NAME=$(uname -m)
+    case "$ARCH_NAME" in
+        x86_64)
+            ARCH_NAME="x86_64"
+            ;;
+        aarch64|arm64)
+            ARCH_NAME="aarch64"
+            ;;
+        *)
+            echo "Unsupported architecture: $ARCH_NAME"
+            exit 1
+            ;;
+    esac
+}
 
 # Function to handle OS-specific path resolution (for Windows Git Bash)
 resolve_path() {
@@ -29,57 +77,110 @@ resolve_path() {
     esac
 }
 
-# Function to download Docker Compose
+# Function to download docker-compose
 download_compose() {
-    echo "Docker Compose binary not found. Downloading..."
-    mkdir -p "$(dirname "$COMPOSE_BIN")"
-
-    # Fetch the latest release from GitHub
-    latest_release=$(curl -s https://api.github.com/repos/docker/compose/releases/latest | grep -o '"tag_name": "[^"]*' | cut -d'"' -f4)
-
-    if [ -z "$latest_release" ]; then
-        echo "Error: Could not fetch the latest release of Docker Compose."
-        exit 1
+    if [ -f "$COMPOSE_BIN" ]; then
+        echo "docker-compose already exists"
+        return 0
     fi
 
-    echo "Latest Docker Compose version: $latest_release"
+    mkdir -p "${PORTABLE_DIR}"
+    echo "Downloading docker-compose..."
+    get_platform_info
 
-    # Normalize OS name and architecture
-    case "$(uname -s)" in
-        MINGW*|CYGWIN*)
-            os_name="windows"
+    # Get latest release
+    local latest_release=$(curl -s "https://api.github.com/repos/docker/compose/releases/latest" | grep -o '"tag_name": "[^"]*' | cut -d'"' -f4)
+    if [ -z "$latest_release" ]; then
+        echo "Error: Could not fetch the latest release for docker-compose"
+        return 1
+    fi
+
+    echo "Latest version: $latest_release"
+    local download_url="https://github.com/docker/compose/releases/download/${latest_release}/docker-compose-${OS_NAME}-${ARCH_NAME}${BINARY_SUFFIX}"
+
+    echo "Downloading from: $download_url"
+    curl -L "$download_url" -o "$COMPOSE_BIN"
+    chmod +x "$COMPOSE_BIN"
+    echo "docker-compose downloaded successfully"
+}
+
+# Function to download docker engine binaries
+download_docker_engine() {
+    # For Mac, we only need docker binary, not dockerd
+    if [ "$OS_NAME" = "darwin" ] && [ -f "$DOCKER_BIN" ]; then
+        echo "docker binary already exists"
+        return 0
+    elif [ "$OS_NAME" != "darwin" ] && [ -f "$DOCKER_BIN" ] && [ -f "$DOCKERD_BIN" ]; then
+        echo "docker and dockerd already exist"
+        return 0
+    fi
+
+    mkdir -p "${PORTABLE_DIR}"
+    echo "Downloading docker engine..."
+    get_platform_info
+
+    # Get latest version using Docker API
+    local latest_version=$(curl -s "https://api.github.com/repos/moby/moby/releases/latest" | grep -o '"tag_name": "[^"]*' | cut -d'"' -f4 | tr -d 'v')
+    echo "Latest version: ${latest_version}"
+
+    # Convert OS_NAME for Docker's URL structure
+    local docker_os
+    case "$OS_NAME" in
+        "darwin")
+            docker_os="mac"
+            ;;
+        "windows")
+            docker_os="win"
             ;;
         *)
-            os_name=$(uname -s | tr '[:upper:]' '[:lower:]')  # Convert to lowercase
+            docker_os="linux"
             ;;
     esac
 
-    arch_name=$(uname -m)  # Architecture (e.g., x86_64)
-    if [ "$arch_name" = "arm64" ]; then
-        arch_name="aarch64"  # Handle Apple Silicon (M1/M2) architecture
+    local docker_archive="${PORTABLE_DIR}/docker.tgz"
+    local download_url="https://download.docker.com/${docker_os}/static/stable/${ARCH_NAME}/docker-${latest_version}.tgz"
+
+    echo "Downloading from: $download_url"
+    if ! curl -L "$download_url" -o "$docker_archive"; then
+        echo "Failed to download from ${download_url}, trying alternative version..."
+        # Try without patch version
+        latest_version=$(echo "$latest_version" | cut -d'.' -f1-2).0
+        download_url="https://download.docker.com/${docker_os}/static/stable/${ARCH_NAME}/docker-${latest_version}.tgz"
+        echo "Trying alternative download: $download_url"
+        if ! curl -L "$download_url" -o "$docker_archive"; then
+            echo "Error: Failed to download docker engine"
+            return 1
+        fi
     fi
 
-    # Download Docker Compose for the current platform with correct suffix
-    echo "Downloading: https://github.com/docker/compose/releases/download/${latest_release}/docker-compose-${os_name}-${arch_name}${binary_suffix}"
-    curl -L "https://github.com/docker/compose/releases/download/${latest_release}/docker-compose-${os_name}-${arch_name}${binary_suffix}" -o "$COMPOSE_BIN"
-    chmod +x "$COMPOSE_BIN"
-    echo "Docker Compose downloaded successfully: $COMPOSE_BIN"
+    tar xzf "$docker_archive" -C "${PORTABLE_DIR}"
+    mv "${PORTABLE_DIR}/docker/docker" "$DOCKER_BIN"
+    # Only move dockerd on non-Mac systems
+    if [ "$OS_NAME" != "darwin" ]; then
+        mv "${PORTABLE_DIR}/docker/dockerd" "$DOCKERD_BIN"
+        chmod +x "$DOCKERD_BIN"
+    fi
+    rm -rf "${PORTABLE_DIR}/docker" "$docker_archive"
+    chmod +x "$DOCKER_BIN"
+    echo "docker engine downloaded successfully"
 }
 
-# Ensure Docker Compose binary exists
-if [ ! -f "$COMPOSE_BIN" ]; then
-    download_compose
-fi
+# Function to ensure all binaries exist
+ensure_binaries() {
+    local missing=0
 
-# Helper function to display usage
-usage() {
-    echo "Usage: $0 {start|stop|clean}"
-    echo
-    echo "start - Start the application (in a detached process). Generates secrets if the secrets folder is missing or empty."
-    echo "stop  - Stop the application"
-    echo "clean - Stop the application, remove all volumes, and delete the secrets folder"
-    echo
-    exit 1
+    if [ ! -f "$DOCKER_BIN" ] || [ ! -f "$DOCKERD_BIN" ]; then
+        download_docker_engine || missing=1
+    fi
+
+    if [ ! -f "$COMPOSE_BIN" ]; then
+        download_compose || missing=1
+    fi
+
+    if [ "$missing" -eq 1 ]; then
+        echo "Error: Failed to download one or more required binaries"
+        exit 1
+    fi
 }
 
 # Check if the first argument is supplied
@@ -90,6 +191,27 @@ fi
 # Define actions
 case "$1" in
     start)
+        # Ensure binaries exist before starting
+        ensure_binaries
+
+        # Set up portable Docker environment
+        export DOCKER_HOST="unix://${PORTABLE_DIR}/docker.sock"
+        export PATH="${PORTABLE_DIR}:$PATH"
+        export DOCKER_CONFIG="${PORTABLE_DIR}/config"
+        export DOCKER_CONTEXT="default"
+        export COMPOSE_DOCKER_CLI_BUILD=0
+
+        # Start portable dockerd if not running
+        if ! "$DOCKER_BIN" info >/dev/null 2>&1; then
+            echo "Starting portable Docker daemon..."
+            "$DOCKERD_BIN" --data-root="${PORTABLE_DIR}/data" \
+                          --exec-root="${PORTABLE_DIR}/exec" \
+                          --pidfile="${PORTABLE_DIR}/docker.pid" \
+                          --host="unix://${PORTABLE_DIR}/docker.sock" &
+            # Wait for daemon to start
+            sleep 5
+        fi
+
         # Check if the secrets folder exists and contains files
         if [ ! -d "$SECRETS_DIR" ] || [ -z "$(ls -A "$SECRETS_DIR" 2>/dev/null)" ]; then
             echo "Secrets folder is missing or empty. Generating secrets..."
@@ -110,7 +232,7 @@ case "$1" in
         mkdir -p ./data/karnak_logs
         echo "Starting the application in a detached mode..."
 
-        # Windows Git Bash does not support `id`, so handle it gracefully
+        # Handle user/group IDs
         if command -v id &>/dev/null; then
             USER_ID=$(id -u)
             GROUP_ID=$(id -g)
@@ -127,6 +249,13 @@ case "$1" in
     stop)
         echo "Stopping the application..."
         "$COMPOSE_BIN" -f "$(resolve_path "$COMPOSE_FILE")" down
+
+        # Stop the portable Docker daemon if running
+        if [ -f "${PORTABLE_DIR}/docker.pid" ]; then
+            echo "Stopping portable Docker daemon..."
+            kill $(cat "${PORTABLE_DIR}/docker.pid")
+            rm -f "${PORTABLE_DIR}/docker.pid"
+        fi
         echo "Application stopped."
         ;;
     
@@ -140,23 +269,32 @@ case "$1" in
 
         echo "Stopping the application and cleaning up volumes..."
         "$COMPOSE_BIN" -f "$(resolve_path "$COMPOSE_FILE")" down --volumes
-        echo "All volumes and data have been deleted."
 
-        # Remove the data folder if it exists
+        # Stop the portable Docker daemon if running
+        if [ -f "${PORTABLE_DIR}/docker.pid" ]; then
+            echo "Stopping portable Docker daemon..."
+            kill $(cat "${PORTABLE_DIR}/docker.pid")
+            rm -f "${PORTABLE_DIR}/docker.pid"
+        fi
+
+        # Clean up portable Docker data
+        echo "Cleaning up portable Docker data..."
+        rm -rf "${PORTABLE_DIR}/data"
+        rm -rf "${PORTABLE_DIR}/exec"
+        rm -f "${PORTABLE_DIR}/docker.sock"
+
+        # Remove the data and secrets folders
         if [ -d "$SECRETS_DIR" ]; then
-            echo "Removing the data folder..."
+            echo "Removing secrets folder..."
             rm -rf "$SECRETS_DIR"
-            echo "Data folder removed."
         fi
-
-        # Remove the secrets folder if it exists
         if [ -d "./data" ]; then
-            echo "Removing the secrets folder..."
+            echo "Removing data folder..."
             rm -rf "./data"
-            echo "Secrets folder removed."
         fi
+        echo "Clean up complete."
         ;;
-    
+
     *)
         usage
         ;;
